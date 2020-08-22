@@ -1,5 +1,5 @@
 # face-mask-detection
-It uses yolov3 framework derived from darknet and trained on masked and non masked images
+It uses customised yolov3 framework trained on masked and non masked images
 
 Dataset:
 https://www.kaggle.com/alexandralorenzo/maskdetection
