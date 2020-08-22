@@ -1,5 +1,5 @@
 # USAGE
-# python yolo.py --image images/baggage_claim.jpg --yolo yolo-coco
+# python yolo_image.py --image images/baggage_claim.jpg --yolo yolo-mask
 
 # import the necessary packages
 import numpy as np
@@ -23,11 +23,6 @@ args = vars(ap.parse_args())
 # load the COCO class labels our YOLO model was trained on
 labelsPath = os.path.sep.join([args["yolo"], "yolo.names"])
 LABELS = open(labelsPath).read().strip().split("\n")
-
-# initialize a list of colors to represent each possible class label
-np.random.seed(42)
-COLORS = np.random.randint(0, 255, size=(len(LABELS), 3),
-	dtype="uint8")
 
 # derive the paths to the YOLO weights and model configuration
 weightsPath = os.path.sep.join([args["yolo"], "yolov3_custom_train_3000.weights"])
@@ -87,8 +82,7 @@ for output in layerOutputs:
 			# box followed by the boxes' width and height
 			box = detection[0:4] * np.array([W, H, W, H])
 			(centerX, centerY, width, height) = box.astype("int")
-			print("D found")
-
+			
 			# use the center (x, y)-coordinates to derive the top and
 			# and left corner of the bounding box
 			x = int(centerX - (width / 2))
@@ -104,7 +98,6 @@ for output in layerOutputs:
 # boxes
 idxs = cv2.dnn.NMSBoxes(boxes, confidences, args["confidence"],
 	args["threshold"])
-print(len(idxs))
 # ensure at least one detection exists
 if len(idxs) > 0:
 	# loop over the indexes we are keeping
@@ -114,10 +107,10 @@ if len(idxs) > 0:
 		(w, h) = (boxes[i][2], boxes[i][3])
 
 		# draw a bounding box rectangle and label on the image
-		color = [int(c) for c in COLORS[classIDs[i]]]
+		label=LABELS[classIDs[i]]
+		color=(0,255,0) if label == "Mask" else (0,0,255)
 		cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
-		text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
-		print(text)
+		text = "{}".format(LABELS[classIDs[i]])
 		cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX,
 			0.5, color, 2)
 		
